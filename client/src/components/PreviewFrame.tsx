@@ -1,9 +1,9 @@
 import { WebContainer } from '@webcontainer/api';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface PreviewFrameProps {
   files: any[];
-  webContainer: WebContainer;
+  webContainer: WebContainer | undefined;
 }
 
 export function PreviewFrame({ files, webContainer }: PreviewFrameProps) {
@@ -11,6 +11,7 @@ export function PreviewFrame({ files, webContainer }: PreviewFrameProps) {
   const [url, setUrl] = useState("");
 
   async function main() {
+    if(webContainer === undefined) return
     const installProcess = await webContainer.spawn('npm', ['install']);
 
     installProcess.output.pipeTo(new WritableStream({
