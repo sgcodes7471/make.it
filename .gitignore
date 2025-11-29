@@ -4,3 +4,4 @@ node_modules
 plan.txt
 .env
 backend-node
+logs.log

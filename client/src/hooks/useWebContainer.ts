@@ -8,6 +8,11 @@ export function useWebContainer() {
         const webcontainerInstance = await WebContainer.boot();
         setWebcontainer(webcontainerInstance)
     }
+
+    useEffect(() => {
+        console.log(webcontainer)
+    } , [webcontainer])
+
     useEffect(() => {
         main();
     }, [])

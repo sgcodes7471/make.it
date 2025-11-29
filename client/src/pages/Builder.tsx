@@ -10,7 +10,6 @@ import axios from 'axios';
 import { BACKEND_URL } from '../config';
 import { parseXml } from '../steps';
 import { useWebContainer } from '../hooks/useWebContainer';
-import { Loader } from '../components/Loader';
 
 // const MOCK_FILE_CONTENT = `// This is a sample file content
 // import React from 'react';
@@ -24,11 +23,10 @@ import { Loader } from '../components/Loader';
 export function Builder() {
   const location = useLocation();
   const { prompt } = location.state as { prompt: string };
-  const [userPrompt, setPrompt] = useState("");
   const [llmMessages, setLlmMessages] = useState<{role: "user" | "assistant", content: string;}[]>([]);
-  const [loading, setLoading] = useState(false);
   const [templateSet, setTemplateSet] = useState(false);
   const webcontainer = useWebContainer();
+  const [url, setUrl] = useState<string>("");
 
   const [currentStep, setCurrentStep] = useState(1);
   const [activeTab, setActiveTab] = useState<'code' | 'preview'>('code');
@@ -99,8 +97,10 @@ export function Builder() {
         
       }))
     }
-    console.log(files);
+    // console.log(files);
   }, [steps, files]);
+
+
 
   useEffect(() => {
     const createMountStructure = (files: FileItem[]): Record<string, any> => {
@@ -145,34 +145,34 @@ export function Builder() {
     const mountStructure = createMountStructure(files);
   
     // Mount the structure if WebContainer is available
-    console.log(mountStructure);
+    // console.log(mountStructure);
     webcontainer?.mount(mountStructure);
   }, [files, webcontainer]);
 
+
+
   async function init() {
     const response = await axios.post(`${BACKEND_URL}/template`, {
-      prompt: prompt.trim()
+      query: prompt.trim()
     });
     setTemplateSet(true);
+    // console.log(response)
     
-    const {prompts, uiPrompts} = response.data;
+    const {prompts, ui_prompts} = response.data;
 
-    setSteps(parseXml(uiPrompts[0]).map((x: Step) => ({
+    setSteps(parseXml(ui_prompts[0]).map((x: Step) => ({
       ...x,
       status: "pending"
     })));
 
-    setLoading(true);
     const stepsResponse = await axios.post(`${BACKEND_URL}/chat`, {
-      messages: [...prompts, prompt].map(content => ({
-        role: "user",
-        content
-      }))
+        base_prompt : prompts.length !== 0 ? prompts[0] : "", 
+        template_prompt : prompts.length !== 0 ? prompts[1] : "",
+        user_prompt : prompt  
     })
 
-    setLoading(false);
-
-    setSteps(s => [...s, ...parseXml(stepsResponse.data.response).map(x => ({
+    setSteps([]);
+    setSteps(s => [...s, ...parseXml(stepsResponse.data.code.content).map(x => ({
       ...x,
       status: "pending" as "pending"
     }))]);
@@ -207,48 +207,17 @@ export function Builder() {
                   onStepClick={setCurrentStep}
                 />
               </div>
-              <div>
-                <div className='flex'>
-                  <br />
-                  {(loading || !templateSet) && <Loader />}
-                  {!(loading || !templateSet) && <div className='flex'>
-                    <textarea value={userPrompt} onChange={(e) => {
-                    setPrompt(e.target.value)
-                  }} className='p-2 w-full'></textarea>
-                  <button onClick={async () => {
-                    const newMessage = {
-                      role: "user" as "user",
-                      content: userPrompt
-                    };
-
-                    setLoading(true);
-                    const stepsResponse = await axios.post(`${BACKEND_URL}/chat`, {
-                      messages: [...llmMessages, newMessage]
-                    });
-                    setLoading(false);
-
-                    setLlmMessages(x => [...x, newMessage]);
-                    setLlmMessages(x => [...x, {
-                      role: "assistant",
-                      content: stepsResponse.data.response
-                    }]);
-                    
-                    setSteps(s => [...s, ...parseXml(stepsResponse.data.response).map(x => ({
-                      ...x,
-                      status: "pending" as "pending"
-                    }))]);
-
-                  }} className='bg-purple-400 px-4'>Send</button>
-                  </div>}
-                </div>
-              </div>
             </div>
           </div>
-          <div className="col-span-1">
-              <FileExplorer 
-                files={files} 
-                onFileSelect={setSelectedFile}
-              />
+          <div className="col-span-1 overflow-auto">
+            <div>
+              <div className="max-h-[75vh] overflow-scroll">
+                <FileExplorer 
+                  files={files} 
+                  onFileSelect={setSelectedFile}
+                />
+              </div>
+            </div>
             </div>
           <div className="col-span-2 bg-gray-900 rounded-lg shadow-lg p-4 h-[calc(100vh-8rem)]">
             <TabView activeTab={activeTab} onTabChange={setActiveTab} />
@@ -256,7 +225,8 @@ export function Builder() {
               {activeTab === 'code' ? (
                 <CodeEditor file={selectedFile} />
               ) : (
-                <PreviewFrame webContainer={webcontainer} files={files} />
+                // <CodeEditor file={selectedFile} />
+                <PreviewFrame webContainer={webcontainer} url={url} setUrl={setUrl}/>
               )}
             </div>
           </div>

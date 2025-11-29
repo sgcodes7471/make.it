@@ -5,9 +5,11 @@ import asyncio
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
+import logging
 
 from prompts import react_base_prompt
 from prompts import node_base_prompt
+from prompts import next_base_prompt
 from prompts import base_prompt
 from prompts import get_system_prompt
 
@@ -23,6 +25,8 @@ chat_client = OpenAI(
     base_url = "https://generativelanguage.googleapis.com/v1beta/openai/"
 )
 
+logging.basicConfig(filename = "logs.log", level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -35,21 +39,21 @@ app.add_middleware(
 )
 
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+class template_props(BaseModel) :
+    query : str
 
-@app.get("/template")
-async def get_template(query : str):
+@app.post("/template")
+async def get_template(props : template_props):
     try :
         response = template_client.models.generate_content(
             model = "gemini-2.5-flash",
             config = types.GenerateContentConfig(
-                system_instruction = "Return either node or react based on what do you think this project should be. Only return a single word either 'node' or 'react'. Do not return anything extra"
+                system_instruction = "Return either node or react or next based on what do you think this project should be, keeping in mind not to add any extra overhead. Only return a single word either 'node' or 'react' or  'next'. Do not return anything extra. Here node refers to the runtime environment of Javascript, react is React.js and next is Next.js."
             ),
-            contents = query
+            contents = props.query
         )
         answer = response.text
+        print(answer)
         if(answer == "react") :
             return {
                 "success" : True,
@@ -64,9 +68,17 @@ async def get_template(query : str):
                 "ui_prompts" : [node_base_prompt]
             }
         
+        if(answer == "next") :
+            return {
+                "success" : True , 
+                "prompts" : [base_prompt , f"Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\n${next_base_prompt}\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n"],
+                "ui_prompts" : [next_base_prompt]
+            }
+        
         return {"success" : False , "message" : "Not able to access this"} 
-    except :
-        return {"success" : False}
+    except Exception as e :
+        logger.error(f"Error in /template : {e}")
+        return {"success" : False , "error" : e}
 
 
 
@@ -87,15 +99,15 @@ async def chat_llm(props : chat_props) :
                 } ,
                 {
                     "role" : "user" ,
-                    "content" : props["base_prompt"]
+                    "content" : props.base_prompt
                 } , 
                 {
                     "role" : "user" , 
-                    "content" : props["template_prompt"]
+                    "content" : props.template_prompt
                 } , 
                 {
                     "role" : "user" ,
-                    "content" : props["user_prompt"]
+                    "content" : props.user_prompt
                 }
             ], 
             # stream = True
@@ -108,7 +120,7 @@ async def chat_llm(props : chat_props) :
             "code" : response.choices[0].message 
         }
     except Exception as e:
-        print(f"Error /chat : {e}")
+        logger.error(f"Error in /template : {e}")
         return {"success" : False , "error" : e}
 
 
