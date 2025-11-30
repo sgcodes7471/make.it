@@ -97,7 +97,7 @@ export function Builder() {
         
       }))
     }
-    // console.log(files);
+    console.log(files);
   }, [steps, files]);
 
 
@@ -189,6 +189,27 @@ export function Builder() {
     init();
   }, [])
 
+  async function downloadZIP() {
+    try {
+      const response = await axios.post(`${BACKEND_URL}/download-zip` , {
+        files 
+      }, {
+        responseType : "blob"
+      });
+  
+      const blob = new Blob([response.data] , {type : "application/zip"});
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "project.zip";
+      a.click();
+      
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.log("Error at download zip : \n" , error);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col">
       <header className="bg-gray-800 border-b border-gray-700 px-6 py-4">
@@ -220,7 +241,7 @@ export function Builder() {
             </div>
             </div>
           <div className="col-span-2 bg-gray-900 rounded-lg shadow-lg p-4 h-[calc(100vh-8rem)]">
-            <TabView activeTab={activeTab} onTabChange={setActiveTab} />
+            <TabView activeTab={activeTab} onTabChange={setActiveTab} downloadZIP = {downloadZIP}/>
             <div className="h-[calc(100%-4rem)]">
               {activeTab === 'code' ? (
                 <CodeEditor file={selectedFile} />

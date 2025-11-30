@@ -5,3 +5,5 @@ plan.txt
 .env
 backend-node
 logs.log
+test.py
+zips
