@@ -21,7 +21,6 @@ from openai import OpenAI
 from google import genai
 from google.genai import types
 
-from test import test_file_struct
 
 load_dotenv()
 
@@ -59,7 +58,7 @@ async def get_template(body : template_body):
             contents = body.query
         )
         answer = response.text
-        print(answer)
+        # print(answer)
         if(answer == "react") :
             return {
                 "success" : True,
@@ -166,11 +165,14 @@ def download_zip(body : download_zip_body):
         
         # create project folder
         project_dir = Path(f"Project-{int(time.time())}")
-        project_dir.mkdir(parents=True, exist_ok=True)
+        project_dir.mkdir(parents = True, exist_ok = True)
+
+        project_folder_dir = Path(f"{str(project_dir)}/Project")
+        project_folder_dir.mkdir(parents = True , exist_ok = True)
         
         # build structure
         for item in files:
-            create_structure(project_dir, item)
+            create_structure(project_folder_dir, item)
         
         # make zip
         zip_path = zips_dir / "project"

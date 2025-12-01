@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+/*
+Source - https://stackoverflow.com/a/38994837
+Posted by Hristo Eftimov, modified by community. See post 'Timeline' for change history
+Retrieved 2025-11-29, License - CC BY-SA 4.0
+*/
+    body ::-webkit-scrollbar { width: 0 !important }  
+
+    body { overflow: -moz-scrollbars-none; }
+
+    body { -ms-overflow-style: none; }
+* {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox, Safari 18.2+, Chromium 121+ */
+}
+*::-webkit-scrollbar { 
+    display: none;  /* Older Safari and Chromium */
+}

@@ -1,9 +1,22 @@
+# modules
 __pycache__
 venv
 node_modules
-plan.txt
-.env
+
+# deprecated
 backend-node
+frontend-react
+
+# logs
 logs.log
-test.py
+
+# env
+.env
+
+# runtime files
 zips
+project
+
+# misc
+plan.txt
+test.py
