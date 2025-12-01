@@ -58,7 +58,7 @@ async def get_template(body : template_body):
             contents = body.query
         )
         answer = response.text
-        # print(answer)
+        print(answer)
         if(answer == "react") :
             return {
                 "success" : True,
