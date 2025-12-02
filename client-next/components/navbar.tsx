@@ -7,7 +7,7 @@ const Navbar = async () => {
     const session = await auth();
 
     return (
-        <header className="px-5 py-3 font-work-sans fixed top-0">
+        <header className="px-5 py-3 font-work-sans fixed top-0 right-0">
             <nav className="flex justify-between items-center">
                 <div className="flex items-center gap-5 text-black">
                     {session && session?.user ? (

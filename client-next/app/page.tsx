@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 // import { useNavigate } from 'react-router-dom';
 import { useRouter } from 'next/navigation';
-import { Wand2 } from 'lucide-react';
+// import About from '@/components/About';
 
 export default function Home() {
   const [prompt, setPrompt] = useState('');
@@ -16,31 +16,30 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4">
+    <>
+    <div className="min-h-screen bg-gradient-to-br from-black to-neutral-900 flex items-center justify-center p-4">
       <div className="max-w-2xl w-full">
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <Wand2 className="w-12 h-12 text-blue-400" />
-          </div>
-          <h1 className="text-4xl font-bold text-gray-100 mb-4">
-            Make.it - Website Builder AI
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-semibold text-neutral-100 tracking-tight mb-3">
+            Make.it — Website Builder AI
           </h1>
-          <p className="text-lg text-gray-300">
-            Describe your dream website, and we'll help you build it step by step
+          <p className="text-base text-neutral-400">
+            Describe your ideal website and get a guided build plan instantly
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="bg-gray-800 rounded-lg shadow-lg p-6">
+          <div className="bg-neutral-950/80 backdrop-blur-sm rounded-xl shadow-xl p-6 border border-neutral-800">
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="Describe the website you want to build..."
-              className="w-full h-32 p-4 bg-gray-900 text-gray-100 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none placeholder-gray-500"
+              className="w-full h-32 p-4 bg-black text-neutral-200 rounded-lg border border-neutral-800 focus:ring-2 focus:ring-neutral-600 focus:border-transparent resize-none placeholder-neutral-500"
             />
+
             <button
               type="submit"
-              className="w-full mt-4 bg-blue-600 text-gray-100 py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              className="w-full mt-5 bg-neutral-800 text-neutral-100 py-3 px-6 rounded-lg font-medium hover:bg-neutral-700 active:scale-[0.98] transition"
             >
               Generate Website Plan
             </button>
@@ -48,5 +47,10 @@ export default function Home() {
         </form>
       </div>
     </div>
+
+    {/* <About/> */}
+    </>
+
+
   );
 }

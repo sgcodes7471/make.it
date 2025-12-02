@@ -17,3 +17,69 @@ Retrieved 2025-11-29, License - CC BY-SA 4.0
 *::-webkit-scrollbar { 
     display: none;  /* Older Safari and Chromium */
 }
+
+@keyframes star-blink {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+
+@keyframes shooting-star {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-200px, 200px) scale(1.5);
+    opacity: 0;
+  }
+}
+
+.animate-star-blink {
+  animation: star-blink 2s linear infinite;
+}
+
+.animate-shooting-star {
+  animation: shooting-star 1.4s ease-in-out infinite;
+}
+
+@keyframes galaxy-spin-slow {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes galaxy-spin-medium {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(-360deg); }
+}
+
+@keyframes galaxy-spin-fast {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(540deg); }
+}
+
+.animate-galaxy-spin-slow {
+  animation: galaxy-spin-slow 35s linear infinite;
+}
+
+.animate-galaxy-spin-medium {
+  animation: galaxy-spin-medium 25s linear infinite;
+}
+
+.animate-galaxy-spin-fast {
+  animation: galaxy-spin-fast 18s linear infinite;
+}
+
+
+.custom-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: rgba(120,120,120,0.3);
+  border-radius: 4px;
+}
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}

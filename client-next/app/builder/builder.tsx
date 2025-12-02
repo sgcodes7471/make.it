@@ -208,48 +208,55 @@ export default function Builder() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col">
-      <header className="bg-gray-800 border-b border-gray-700 px-6 py-4">
-        <h1 className="text-xl font-semibold text-gray-100">Website Builder</h1>
-        <p className="text-sm text-gray-400 mt-1">Prompt: {prompt}</p>
-      </header>
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-black to-neutral-900">
+  <header className="bg-neutral-950 border-b border-neutral-800 px-6 py-4 shadow-md">
+    <h1 className="text-xl font-semibold text-neutral-100 tracking-tight">Website Builder</h1>
+    <p className="text-sm text-neutral-500 mt-1">Prompt: {prompt}</p>
+  </header>
+  
+  <div className="flex-1 overflow-hidden">
+    <div className="h-full grid grid-cols-4 gap-6 p-6">
       
-      <div className="flex-1 overflow-hidden">
-        <div className="h-full grid grid-cols-4 gap-6 p-6">
-          <div className="col-span-1 space-y-6 overflow-auto">
-            <div>
-              <div className="max-h-[75vh] overflow-scroll">
-                <StepsList
-                  steps={steps}
-                  currentStep={currentStep}
-                  onStepClick={setCurrentStep}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="col-span-1 overflow-auto">
-            <div>
-              <div className="max-h-[75vh] overflow-scroll">
-                <FileExplorer 
-                  files={files} 
-                  onFileSelect={setSelectedFile}
-                />
-              </div>
-            </div>
-            </div>
-          <div className="col-span-2 bg-gray-900 rounded-lg shadow-lg p-4 h-[calc(100vh-8rem)]">
-            <TabView activeTab={activeTab} onTabChange={setActiveTab} downloadZIP = {downloadZIP}/>
-            <div className="h-[calc(100%-4rem)]">
-              {activeTab === 'code' ? (
-                <CodeEditor file={selectedFile} />
-              ) : (
-                // <CodeEditor file={selectedFile} />
-                <PreviewFrame webContainer={webcontainer} url={url} setUrl={setUrl}/>
-              )}
-            </div>
+      {/* Steps */}
+      <div className="col-span-1 space-y-6 overflow-auto">
+        <div className="bg-neutral-950/40 p-4 rounded-xl border border-neutral-800 shadow-md">
+          <div className="max-h-[75vh] overflow-scroll custom-scroll">
+            <StepsList
+              steps={steps}
+              currentStep={currentStep}
+              onStepClick={setCurrentStep}
+            />
           </div>
         </div>
       </div>
+
+      {/* File Explorer */}
+      <div className="col-span-1 overflow-auto">
+        <div className="bg-neutral-950/40 p-4 rounded-xl border border-neutral-800 shadow-md">
+          <div className="max-h-[75vh] overflow-scroll custom-scroll">
+            <FileExplorer 
+              files={files} 
+              onFileSelect={setSelectedFile}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Preview / Code */}
+      <div className="col-span-2 bg-neutral-950/70 backdrop-blur-sm rounded-xl border border-neutral-800 shadow-lg p-4 h-[calc(100vh-8rem)]">
+        <TabView activeTab={activeTab} onTabChange={setActiveTab} downloadZIP={downloadZIP} />
+
+        <div className="h-[calc(100%-4rem)] mt-2 rounded-lg border border-neutral-800 bg-black/40">
+          {activeTab === "code" ? (
+            <CodeEditor file={selectedFile} />
+          ) : (
+            <PreviewFrame webContainer={webcontainer} url={url} setUrl={setUrl} />
+          )}
+        </div>
+      </div>
     </div>
+  </div>
+</div>
+
   );
 }
