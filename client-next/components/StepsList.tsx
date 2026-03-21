@@ -21,7 +21,7 @@ export function StepsList({ steps, currentStep, onStepClick }: StepsListProps) {
     <div className="bg-gray-900 rounded-lg shadow-lg p-4 h-full overflow-auto">
       <div className='flex justify-between'>
         <h2 className="text-lg font-semibold mb-4 text-gray-100">Build Steps</h2>
-         <label className="inline-flex items-center cursor-pointer">
+         <label className="inline-flex items-center cursor-pointer mr-10">
           <input type="checkbox" className="sr-only peer" onClick={() => {
             handleCommandsToggle()
           }}/>
