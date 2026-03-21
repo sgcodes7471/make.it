@@ -1,8 +1,6 @@
 "use client"
 import React, { useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
 import { useRouter } from 'next/navigation';
-// import About from '@/components/About';
 
 export default function Home() {
   const [prompt, setPrompt] = useState('');
@@ -48,7 +46,6 @@ export default function Home() {
       </div>
     </div>
 
-    {/* <About/> */}
     </>
 
 
