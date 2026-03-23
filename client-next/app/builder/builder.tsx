@@ -8,7 +8,7 @@ import { CodeEditor } from '../../components/CodeEditor';
 import { PreviewFrame } from '../../components/PreviewFrame';
 import { Step, FileItem, StepType } from '../../types';
 import axios from 'axios';
-import { BACKEND_URL } from '../../config';
+// import { BACKEND_URL } from '../../config';
 import { parseXml } from '../../steps';
 import { useWebContainer } from '../../hooks/useWebContainer';
 import { useSearchParams } from 'next/navigation';
@@ -149,7 +149,7 @@ export default function Builder() {
     if(!prompt) {
       return ;
     } 
-    const response = await axios.post(`${BACKEND_URL}/template`, {
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/template`, {
       query: prompt.trim()
     });
     setTemplateSet(true);
@@ -162,7 +162,7 @@ export default function Builder() {
       status: "pending"
     })));
 
-    const stepsResponse = await axios.post(`${BACKEND_URL}/chat`, {
+    const stepsResponse = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/chat`, {
         base_prompt : prompts.length !== 0 ? prompts[0] : "", 
         template_prompt : prompts.length !== 0 ? prompts[1] : "",
         user_prompt : prompt  
@@ -188,7 +188,7 @@ export default function Builder() {
 
   async function downloadZIP() {
     try {
-      const response = await axios.post(`${BACKEND_URL}/download-zip` , {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/download-zip` , {
         files 
       }, {
         responseType : "blob"
