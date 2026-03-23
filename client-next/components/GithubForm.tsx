@@ -1,13 +1,13 @@
 "use client"
 
-import { auth } from "@/auth";
+// import { auth } from "@/auth";
 import { useEffect, useState } from "react";
 
 interface RepoFormProps {
   onClose: () => void; 
 }
 
-export default async function GithubForm({
+export default function GithubForm({
   onClose,
 }: RepoFormProps) {
 
@@ -17,11 +17,11 @@ export default async function GithubForm({
     const [description , setDescription] = useState<string>("");
     const [token, setToken] = useState<string>("");
 
-    const session = await auth();
+    // const session = await auth();
 
-    useEffect(() => {
-      console.log(session)
-    }, [session])
+    // useEffect(() => {
+    //   console.log(session)
+    // }, [session])
 
     async function handleRepoCreation() {
       try {

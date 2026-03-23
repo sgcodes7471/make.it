@@ -36,8 +36,8 @@ export default function Builder() {
     steps.filter(({status}) => status === "pending").map(step => {
       updateHappened = true;
       if (step?.type === StepType.CreateFile) {
-        let parsedPath = step.path?.split("/") ?? []; // ["src", "components", "App.tsx"]
-        let currentFileStructure = [...originalFiles]; // {}
+        let parsedPath = step.path?.split("/") ?? []; 
+        let currentFileStructure = [...originalFiles]; 
         let finalAnswerRef = currentFileStructure;
   
         let currentFolder = ""
@@ -60,10 +60,8 @@ export default function Builder() {
               file.content = step.code;
             }
           } else {
-            /// in a folder
             let folder = currentFileStructure.find(x => x.path === currentFolder)
             if (!folder) {
-              // create the folder
               currentFileStructure.push({
                 name: currentFolderName,
                 type: 'folder',
@@ -102,7 +100,6 @@ export default function Builder() {
   
       const processFile = (file: FileItem, isRootFolder: boolean) => {  
         if (file.type === 'folder') {
-          // For folders, create a directory entry
           mountStructure[file.name] = {
             directory: file.children ? 
               Object.fromEntries(
@@ -118,7 +115,6 @@ export default function Builder() {
               }
             };
           } else {
-            // For files, create a file entry with contents
             return {
               file: {
                 contents: file.content || ''
@@ -130,7 +126,6 @@ export default function Builder() {
         return mountStructure[file.name];
       };
   
-      // Process each top-level file/folder
       files.forEach(file => processFile(file, true));
   
       return mountStructure;
@@ -138,8 +133,6 @@ export default function Builder() {
   
     const mountStructure = createMountStructure(files);
   
-    // Mount the structure if WebContainer is available
-    // console.log(mountStructure);
     webcontainer?.mount(mountStructure);
   }, [files, webcontainer]);
 
@@ -149,37 +142,41 @@ export default function Builder() {
     if(!prompt) {
       return ;
     } 
-    const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/template`, {
-      query: prompt.trim()
-    });
-    setTemplateSet(true);
-    // console.log(response)
-    
-    const {prompts, ui_prompts} = response.data;
-
-    setSteps(parseXml(ui_prompts[0]).map((x: Step) => ({
-      ...x,
-      status: "pending"
-    })));
-
-    const stepsResponse = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/chat`, {
-        base_prompt : prompts.length !== 0 ? prompts[0] : "", 
-        template_prompt : prompts.length !== 0 ? prompts[1] : "",
-        user_prompt : prompt  
-    })
-
-    setSteps([]);
-    setSteps(s => [...s, ...parseXml(stepsResponse.data.code.content).map(x => ({
-      ...x,
-      status: "pending" as "pending"
-    }))]);
-
-    setLlmMessages([...prompts, prompt].map(content => ({
-      role: "user",
-      content
-    })));
-
-    setLlmMessages(x => [...x, {role: "assistant", content: stepsResponse.data.response}])
+    try {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/template`, {
+        query: prompt.trim()
+      });
+      setTemplateSet(true);
+      // console.log(response)
+      
+      const {prompts, ui_prompts} = response.data;
+  
+      setSteps(parseXml(ui_prompts[0]).map((x: Step) => ({
+        ...x,
+        status: "pending"
+      })));
+  
+      const stepsResponse = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/chat`, {
+          base_prompt : prompts.length !== 0 ? prompts[0] : "", 
+          template_prompt : prompts.length !== 0 ? prompts[1] : "",
+          user_prompt : prompt  
+      })
+  
+      setSteps([]);
+      setSteps(s => [...s, ...parseXml(stepsResponse.data.code.content).map(x => ({
+        ...x,
+        status: "pending" as "pending"
+      }))]);
+  
+      setLlmMessages([...prompts, prompt].map(content => ({
+        role: "user",
+        content
+      })));
+  
+      setLlmMessages(x => [...x, {role: "assistant", content: stepsResponse.data.response}])
+    } catch (error) {
+      console.log("Error at generating the code : \n" , error);
+    }
   }
 
   useEffect(() => {

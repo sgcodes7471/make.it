@@ -13,27 +13,31 @@ export function PreviewFrame({ webContainer , url, setUrl }: PreviewFrameProps) 
   // In a real implementation, this would compile and render the preview
   // const [url, setUrl] = useState("");
   async function main() {
-    if(webContainer === undefined) return
-    const installProcess = await webContainer.spawn('npm', ['install']);
-
-    const installExitCode = await installProcess.exit;
-        
-    if (installExitCode !== 0) {
-      console.log("Installation failed");
-      return
+    try {
+      if(webContainer === undefined) return
+      const installProcess = await webContainer.spawn('npm', ['install']);
+  
+      const installExitCode = await installProcess.exit;
+          
+      if (installExitCode !== 0) {
+        console.log("Installation failed");
+        return
+      }
+  
+      console.log('Dependencies installed successfully');
+  
+      await webContainer.spawn('npm', ['run', 'dev']);
+  
+      // Wait for `server-ready` event
+      webContainer.on('server-ready', (port, url) => {
+        // ...
+        console.log(url)
+        console.log(port)
+        setUrl(url);
+      });
+    } catch (error) {
+      console.log(error)
     }
-
-    console.log('Dependencies installed successfully');
-
-    await webContainer.spawn('npm', ['run', 'dev']);
-
-    // Wait for `server-ready` event
-    webContainer.on('server-ready', (port, url) => {
-      // ...
-      console.log(url)
-      console.log(port)
-      setUrl(url);
-    });
   }
 
   useEffect(() => {
