@@ -13,6 +13,11 @@ logs.log
 # env
 .env
 
+# data
+*.json
+*.csv
+*.xls
+
 # runtime files
 zips
 project
@@ -20,3 +25,4 @@ project
 # misc
 plan.txt
 test.py
+work*

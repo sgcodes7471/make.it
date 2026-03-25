@@ -10,6 +10,7 @@ import shutil
 import os
 import logging
 import time
+import uvicorn
 
 from prompts import react_base_prompt
 from prompts import node_base_prompt
@@ -91,6 +92,12 @@ class chat_body(BaseModel) :
     base_prompt : str 
     template_prompt : str
     user_prompt : str
+
+@app.get("/health")
+async def health_check() :
+    return {
+        "Success" : True
+    } 
 
 @app.post("/chat") 
 async def chat_llm(body : chat_body) :
@@ -197,7 +204,7 @@ def download_zip(body : download_zip_body):
 
 
 if __name__ == "__main__":
-    uvicorn.run("make.it:app", host = "127.0.0.1", port = 8000, reload = True)
+    uvicorn.run("main:app", host = "127.0.0.1", port = 8080, reload = True)
     # files = [file_item(**p) for p in test_file_struct]
     # body = download_zip_body(files = files)
     # response = download_zip(body)
