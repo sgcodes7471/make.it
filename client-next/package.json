@@ -9,7 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@codesandbox/sandpack-react": "^2.20.0",
     "@monaco-editor/react": "^4.7.0",
     "@webcontainer/api": "^1.6.1",
     "axios": "^1.13.2",
