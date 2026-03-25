@@ -30,6 +30,21 @@ export default function Builder() {
 
   const [files, setFiles] = useState<FileItem[]>([]);
 
+  const updateFileContent = (path: string, content: string) => {
+    const update = (items: FileItem[]): FileItem[] =>
+      items.map(item => {
+        if (item.type === 'file' && item.path === path) {
+          return { ...item, content };
+        }
+        if (item.children) {
+          return { ...item, children: update(item.children) };
+        }
+        return item;
+      });
+
+    setFiles(prev => update(prev));
+  };
+
   useEffect(() => {
     let originalFiles = [...files];
     let updateHappened = false;
@@ -245,7 +260,7 @@ export default function Builder() {
 
         <div className="h-[calc(100%-4rem)] mt-2 rounded-lg border border-neutral-800 bg-black/40">
           {activeTab === "code" ? (
-            <CodeEditor file={selectedFile} />
+            <CodeEditor file={selectedFile} onChange={updateFileContent}/>
           ) : (
             <PreviewFrame webContainer={webcontainer} url={url} setUrl={setUrl} />
           )}
