@@ -30,6 +30,16 @@ export default function Builder() {
 
   const [files, setFiles] = useState<FileItem[]>([]);
 
+  /**
+   * This is function is used when the user manually edits in the files generated
+   * @param path the path of the file according to the file structure
+   * @param content the present content in the file after the edit
+   * 
+   * Called in the Code Editor component
+   * recursively searches the file using the path(via string matching) and replaces the content
+   * The recursive functions returns the file or the folder irrespective of whether it is edited or not
+   * the final returned object it then stored in the Files state
+   */
   const updateFileContent = (path: string, content: string) => {
     const update = (items: FileItem[]): FileItem[] =>
       items.map(item => {
@@ -108,46 +118,53 @@ export default function Builder() {
   }, [steps, files]);
 
 
+/**
+ * This is functions is used to build the folder structure with all the code/content in form of js objects
+ * @param files 
+ * @returns 
+ * 
+ * the function runs whenever there is any change in the file content/structure using useEffect hook
+ * the mountstructure created is sent to the webcontainer, thus made according to webcontainer docs
+ */
+  const createMountStructure = (files: FileItem[]): Record<string, any> => {
+    const mountStructure: Record<string, any> = {};
+
+    const processFile = (file: FileItem, isRootFolder: boolean) => {  
+      if (file.type === 'folder') {
+        mountStructure[file.name] = {
+          directory: file.children ? 
+            Object.fromEntries(
+              file.children.map(child => [child.name, processFile(child, false)])
+            ) 
+            : {}
+        };
+      } else if (file.type === 'file') {
+        if (isRootFolder) {
+          mountStructure[file.name] = {
+            file: {
+              contents: file.content || ''
+            }
+          };
+        } else {
+          return {
+            file: {
+              contents: file.content || ''
+            }
+          };
+        }
+      }
+
+      return mountStructure[file.name];
+    };
+
+    files.forEach(file => processFile(file, true));
+
+    return mountStructure;
+  };
 
   useEffect(() => {
-    const createMountStructure = (files: FileItem[]): Record<string, any> => {
-      const mountStructure: Record<string, any> = {};
-  
-      const processFile = (file: FileItem, isRootFolder: boolean) => {  
-        if (file.type === 'folder') {
-          mountStructure[file.name] = {
-            directory: file.children ? 
-              Object.fromEntries(
-                file.children.map(child => [child.name, processFile(child, false)])
-              ) 
-              : {}
-          };
-        } else if (file.type === 'file') {
-          if (isRootFolder) {
-            mountStructure[file.name] = {
-              file: {
-                contents: file.content || ''
-              }
-            };
-          } else {
-            return {
-              file: {
-                contents: file.content || ''
-              }
-            };
-          }
-        }
-  
-        return mountStructure[file.name];
-      };
-  
-      files.forEach(file => processFile(file, true));
-  
-      return mountStructure;
-    };
-  
     const mountStructure = createMountStructure(files);
-  
+
     webcontainer?.mount(mountStructure);
   }, [files, webcontainer]);
 
@@ -198,29 +215,9 @@ export default function Builder() {
     init();
   }, [])
 
-  async function downloadZIP() {
-    try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/download-zip` , {
-        files 
-      }, {
-        responseType : "blob"
-      });
-  
-      const blob = new Blob([response.data] , {type : "application/zip"});
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "project.zip";
-      a.click();
-      
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.log("Error at download zip : \n" , error);
-    }
-  }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-black to-neutral-900">
+<div className="min-h-screen flex flex-col bg-gradient-to-br from-black to-neutral-900">
   <header className="bg-neutral-950 border-b border-neutral-800 px-6 py-4 shadow-md">
     <h1 className="text-xl font-semibold text-neutral-100 tracking-tight">Website Builder</h1>
     <p className="text-sm text-neutral-500 mt-1">Prompt: {prompt}</p>
@@ -256,7 +253,11 @@ export default function Builder() {
 
       {/* Preview / Code */}
       <div className="col-span-2 bg-neutral-950/70 backdrop-blur-sm rounded-xl border border-neutral-800 shadow-lg p-4 h-[calc(100vh-8rem)]">
-        <TabView activeTab={activeTab} onTabChange={setActiveTab} downloadZIP={downloadZIP} />
+        <TabView 
+          activeTab={activeTab} 
+          onTabChange={setActiveTab} 
+          files={files} 
+        />
 
         <div className="h-[calc(100%-4rem)] mt-2 rounded-lg border border-neutral-800 bg-black/40">
           {activeTab === "code" ? (
