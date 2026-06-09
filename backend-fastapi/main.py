@@ -1,8 +1,6 @@
 from typing import Union, List, Optional, Literal
-from fastapi import FastAPI
 from pydantic import BaseModel
 import asyncio
-from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from fastapi.responses import FileResponse
 from pathlib import Path
@@ -18,32 +16,19 @@ from prompts import next_base_prompt
 from prompts import base_prompt
 from prompts import get_system_prompt
 
-from openai import OpenAI
-from google import genai
-from google.genai import types
+from configs.llm import create_gemini_client
+from configs.llm import create_openai_client
+
+import app from app
 
 
 load_dotenv()
 
-template_client = genai.Client(api_key = os.getenv("GEMINI_API_KEY"))
-chat_client = OpenAI(
-    api_key = os.getenv("GEMINI_API_KEY"),
-    base_url = "https://generativelanguage.googleapis.com/v1beta/openai/"
-)
+template_client = create_gemini_client(os.getenv("GEMINI_API_KEY"))
+chat_client = create_openai_client(os.getenv("GEMINI_API_KEY"))
 
 logging.basicConfig(filename = "logs.log", level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
-
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware , 
-    allow_origins = [os.getenv("ALLOWED_ORIGINS")] , 
-    allow_credentials = True , 
-    allow_methods = ["*"],
-    allow_headers = ["*"]
-)
-
 
 class template_body(BaseModel) :
     query : str
